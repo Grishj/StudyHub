@@ -1,7 +1,7 @@
 import React from "react";
-import { SafeAreaView, StyleSheet, ViewStyle } from "react-native";
+import { StyleSheet, ViewStyle } from "react-native";
 import { useTheme } from "@hooks/useTheme";
-
+import { SafeAreaView } from "react-native-safe-area-context";
 interface SafeAreaWrapperProps {
   children: React.ReactNode;
   style?: ViewStyle;

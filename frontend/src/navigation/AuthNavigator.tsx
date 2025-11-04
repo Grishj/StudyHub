@@ -1,6 +1,6 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { AuthStackParamList } from "@types/navigation.types";
+import { AuthStackParamList } from "../types/navigation.types";
 import {
   OnboardingScreen,
   LoginScreen,
@@ -15,6 +15,7 @@ export const AuthNavigator: React.FC = () => {
     <Stack.Navigator
       screenOptions={{
         headerShown: false,
+        animation: "slide_from_right",
       }}
       initialRouteName="Onboarding"
     >
@@ -22,6 +23,8 @@ export const AuthNavigator: React.FC = () => {
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Register" component={RegisterScreen} />
       <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+          {/* <Stack.Screen name="VerifyOTP" component={VerifyOTPScreen} />
+      <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} /> */}
     </Stack.Navigator>
   );
 };
