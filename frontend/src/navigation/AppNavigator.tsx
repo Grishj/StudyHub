@@ -1,21 +1,17 @@
-import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { useAppSelector } from '@store/hooks';
-import { AuthNavigator } from './AuthNavigator';
-// Import MainNavigator when ready
-// import { MainNavigator } from './MainNavigator';
+// Update AppNavigator.tsx to use navigation ref:
+
+import React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import { MainNavigator } from "./MainNavigator";
+import { navigationRef } from "@utils/navigation.utils";
 
 export const AppNavigator: React.FC = () => {
-  const { isAuthenticated } = useAppSelector((state) => state.auth);
-
   return (
-    <NavigationContainer>
-      {isAuthenticated ? (
-        // <MainNavigator /> // Will be created later
-        <AuthNavigator /> // Temporary
-      ) : (
-        <AuthNavigator />
-      )}
-    </NavigationContainer>
+    <SafeAreaProvider>
+      <NavigationContainer ref={navigationRef}>
+        <MainNavigator />
+      </NavigationContainer>
+    </SafeAreaProvider>
   );
 };

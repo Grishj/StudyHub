@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useForm, Controller } from "react-hook-form";
@@ -12,14 +12,16 @@ import { TextInput } from "@components/common/Input/TextInput";
 import { PrimaryButton } from "@components/common/Button/PrimaryButton";
 import { Card } from "@components/common/Card/Card";
 import { useTheme } from "@hooks/useTheme";
-import { authService } from "@api/services/auth.service";
+import { useAppDispatch, useAppSelector } from "@store/hooks";
+import { forgotPassword, clearError } from "@store/slices/authSlice";
 import { forgotPasswordSchema } from "@utils/validation/authSchema";
 
 type Props = NativeStackScreenProps<AuthStackParamList, "ForgotPassword">;
 
 export const ForgotPasswordScreen: React.FC<Props> = ({ navigation }) => {
   const theme = useTheme();
-  const [loading, setLoading] = useState(false);
+  const dispatch = useAppDispatch();
+  const { loading, error } = useAppSelector((state) => state.auth);
 
   const {
     control,
@@ -32,13 +34,19 @@ export const ForgotPasswordScreen: React.FC<Props> = ({ navigation }) => {
     },
   });
 
+  useEffect(() => {
+    if (error) {
+      Alert.alert("Error", error);
+      dispatch(clearError());
+    }
+  }, [error, dispatch]);
+
   const onSubmit = async (data: ForgotPasswordData) => {
-    setLoading(true);
     try {
-      const response = await authService.forgotPassword(data);
+      await dispatch(forgotPassword(data)).unwrap();
       Alert.alert(
         "Success",
-        response.message || "Password reset link sent to your email",
+        "Password reset link has been sent to your email. Please check your inbox.",
         [
           {
             text: "OK",
@@ -46,13 +54,8 @@ export const ForgotPasswordScreen: React.FC<Props> = ({ navigation }) => {
           },
         ]
       );
-    } catch (error: any) {
-      Alert.alert(
-        "Error",
-        error.response?.data?.message || "Failed to send reset link"
-      );
-    } finally {
-      setLoading(false);
+    } catch (err) {
+      // Error handled by useEffect
     }
   };
 

@@ -10,53 +10,56 @@ datasource db {
 }
 
 model User {
-  id                String    @id @default(uuid())
-  email             String    @unique
-  password          String
-  fullName          String
-  avatar            String?
-  bio               String?
-  isEmailVerified   Boolean   @default(false)
+  id                     String    @id @default(uuid())
+  email                  String    @unique
+  password               String
+  fullName               String
+  avatar                 String?
+  bio                    String?
+  isEmailVerified        Boolean   @default(false)
   emailVerificationToken String?
-  passwordResetToken String?
-  passwordResetExpires DateTime?
-  refreshToken      String?
-  lastLogin         DateTime?
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  passwordResetToken     String?
+  passwordResetExpires   DateTime?
+  refreshToken           String?
+  lastLogin              DateTime?
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
 
   // Relations
-  profile           Profile?
-  notes             Note[]
-  questions         Question[]
-  quizAttempts      QuizAttempt[]
-  groups            GroupMember[]
-  bookmarks         Bookmark[]
-  notifications     Notification[]
-  achievements      UserAchievement[]
-  progress          UserProgress[]
-  aiConversations   AIConversation[]
-  votes             Vote[]
-  comments          Comment[]
-  reports           Report[]
+  profile         Profile?
+  notes           Note[]
+  questions       Question[]
+  quizAttempts    QuizAttempt[]
+  groups          GroupMember[]
+  bookmarks       Bookmark[]
+  notifications   Notification[]
+  achievements    UserAchievement[]
+  progress        UserProgress[]
+  aiConversations AIConversation[]
+  votes           Vote[]
+  comments        Comment[]
+  reports         Report[]
+  groupMessages   GroupMessage[]
+  uploadedFiles   UploadedFile[]
+  downloadHistory DownloadHistory[]
 
   @@map("users")
 }
 
 model Profile {
-  id              String   @id @default(uuid())
-  userId          String   @unique
-  phone           String?
-  dateOfBirth     DateTime?
-  address         String?
-  targetExam      String?  // NRB, NTC, NEA, Federal
-  points          Int      @default(0)
-  streak          Int      @default(0)
-  lastActiveDate  DateTime @default(now())
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String    @id @default(uuid())
+  userId         String    @unique
+  phone          String?
+  dateOfBirth    DateTime?
+  address        String?
+  targetExam     String? // NRB, NTC, NEA, Federal
+  points         Int       @default(0)
+  streak         Int       @default(0)
+  lastActiveDate DateTime  @default(now())
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("profiles")
 }
@@ -69,14 +72,15 @@ model Category {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  syllabi     Syllabus[]
-  notes       Note[]
-  questions   Question[]
-  quizzes     Quiz[]
+  syllabi   Syllabus[]
+  notes     Note[]
+  questions Question[]
+  quizzes   Quiz[]
 
   @@map("categories")
 }
 
+// Update Syllabus model
 model Syllabus {
   id          String   @id @default(uuid())
   categoryId  String
@@ -85,6 +89,8 @@ model Syllabus {
   content     String   @db.Text
   fileUrl     String?
   order       Int      @default(0)
+  viewCount   Int      @default(0)     // NEW
+  downloadCount Int    @default(0)     // NEW
   isPublished Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -94,18 +100,20 @@ model Syllabus {
   @@map("syllabi")
 }
 
+// Update Note model
 model Note {
   id          String   @id @default(uuid())
   userId      String
   categoryId  String
   title       String
   content     String   @db.Text
-  fileType    String?  // pdf, image, text
+  fileType    String?
   fileUrl     String?
   tags        String[]
   viewCount   Int      @default(0)
   upvotes     Int      @default(0)
   downvotes   Int      @default(0)
+  downloadCount Int    @default(0)  // NEW
   isApproved  Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -119,6 +127,7 @@ model Note {
   @@map("notes")
 }
 
+// Update Question model
 model Question {
   id          String   @id @default(uuid())
   userId      String
@@ -131,6 +140,7 @@ model Question {
   viewCount   Int      @default(0)
   upvotes     Int      @default(0)
   downvotes   Int      @default(0)
+  downloadCount Int    @default(0)  // NEW
   isApproved  Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -150,66 +160,66 @@ model Quiz {
   title       String
   description String?
   difficulty  String   @default("medium") // easy, medium, hard
-  timeLimit   Int?     // in minutes
+  timeLimit   Int? // in minutes
   isDaily     Boolean  @default(false)
   isPublished Boolean  @default(true)
   date        DateTime @default(now())
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  category    Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  questions   QuizQuestion[]
-  attempts    QuizAttempt[]
+  category  Category?      @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  questions QuizQuestion[]
+  attempts  QuizAttempt[]
 
   @@map("quizzes")
 }
 
 model QuizQuestion {
-  id          String   @id @default(uuid())
-  quizId      String
-  question    String   @db.Text
-  options     Json     // Array of options
+  id            String   @id @default(uuid())
+  quizId        String
+  question      String   @db.Text
+  options       Json // Array of options
   correctAnswer String
-  explanation String?  @db.Text
-  points      Int      @default(1)
-  order       Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  explanation   String?  @db.Text
+  points        Int      @default(1)
+  order         Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  quiz        Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
 
   @@map("quiz_questions")
 }
 
 model QuizAttempt {
-  id          String   @id @default(uuid())
-  userId      String
-  quizId      String
-  score       Int
+  id             String   @id @default(uuid())
+  userId         String
+  quizId         String
+  score          Int
   totalQuestions Int
   correctAnswers Int
-  timeTaken   Int?     // in seconds
-  answers     Json     // User's answers
-  completedAt DateTime @default(now())
-  createdAt   DateTime @default(now())
+  timeTaken      Int? // in seconds
+  answers        Json // User's answers
+  completedAt    DateTime @default(now())
+  createdAt      DateTime @default(now())
 
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  quiz        Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
 
   @@map("quiz_attempts")
 }
 
 model Vote {
-  id          String   @id @default(uuid())
-  userId      String
-  noteId      String?
-  questionId  String?
-  voteType    String   // upvote, downvote
-  createdAt   DateTime @default(now())
+  id         String   @id @default(uuid())
+  userId     String
+  noteId     String?
+  questionId String?
+  voteType   String // upvote, downvote
+  createdAt  DateTime @default(now())
 
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  note        Note?     @relation(fields: [noteId], references: [id], onDelete: Cascade)
-  question    Question? @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  note     Note?     @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  question Question? @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
   @@unique([userId, noteId])
   @@unique([userId, questionId])
@@ -217,31 +227,31 @@ model Vote {
 }
 
 model Comment {
-  id          String   @id @default(uuid())
-  userId      String
-  noteId      String?
-  questionId  String?
-  content     String   @db.Text
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         String   @id @default(uuid())
+  userId     String
+  noteId     String?
+  questionId String?
+  content    String   @db.Text
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  note        Note?     @relation(fields: [noteId], references: [id], onDelete: Cascade)
-  question    Question? @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  note     Note?     @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  question Question? @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
   @@map("comments")
 }
 
 model Bookmark {
-  id          String   @id @default(uuid())
-  userId      String
-  noteId      String?
-  questionId  String?
-  createdAt   DateTime @default(now())
+  id         String   @id @default(uuid())
+  userId     String
+  noteId     String?
+  questionId String?
+  createdAt  DateTime @default(now())
 
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  note        Note?     @relation(fields: [noteId], references: [id], onDelete: Cascade)
-  question    Question? @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  note     Note?     @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  question Question? @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
   @@unique([userId, noteId])
   @@unique([userId, questionId])
@@ -258,36 +268,37 @@ model Group {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  members     GroupMember[]
+  members  GroupMember[]
+  messages GroupMessage[]
 
   @@map("groups")
 }
 
 model GroupMember {
-  id          String   @id @default(uuid())
-  groupId     String
-  userId      String
-  role        String   @default("member") // admin, moderator, member
-  joinedAt    DateTime @default(now())
+  id       String   @id @default(uuid())
+  groupId  String
+  userId   String
+  role     String   @default("member") // admin, moderator, member
+  joinedAt DateTime @default(now())
 
-  group       Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([groupId, userId])
   @@map("group_members")
 }
 
 model Notification {
-  id          String   @id @default(uuid())
-  userId      String
-  title       String
-  message     String
-  type        String   // info, success, warning, error
-  isRead      Boolean  @default(false)
-  data        Json?
-  createdAt   DateTime @default(now())
+  id        String   @id @default(uuid())
+  userId    String
+  title     String
+  message   String
+  type      String // info, success, warning, error
+  isRead    Boolean  @default(false)
+  data      Json?
+  createdAt DateTime @default(now())
 
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("notifications")
 }
@@ -298,10 +309,10 @@ model Achievement {
   description String
   icon        String?
   points      Int      @default(0)
-  criteria    Json     // Conditions to unlock
+  criteria    Json // Conditions to unlock
   createdAt   DateTime @default(now())
 
-  users       UserAchievement[]
+  users UserAchievement[]
 
   @@map("achievements")
 }
@@ -312,8 +323,8 @@ model UserAchievement {
   achievementId String
   unlockedAt    DateTime @default(now())
 
-  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
 
   @@unique([userId, achievementId])
   @@map("user_achievements")
@@ -328,21 +339,21 @@ model UserProgress {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, topic])
   @@map("user_progress")
 }
 
 model AIConversation {
-  id          String   @id @default(uuid())
-  userId      String
-  title       String   @default("New Conversation")
-  messages    Json     // Array of messages
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(uuid())
+  userId    String
+  title     String   @default("New Conversation")
+  messages  Json // Array of messages
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("ai_conversations")
 }
@@ -350,7 +361,7 @@ model AIConversation {
 model Report {
   id          String   @id @default(uuid())
   userId      String
-  contentType String   // note, question, comment
+  contentType String // note, question, comment
   contentId   String
   reason      String
   description String?  @db.Text
@@ -358,7 +369,61 @@ model Report {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("reports")
+}
+
+model GroupMessage {
+  id          String   @id @default(uuid())
+  groupId     String
+  userId      String
+  content     String   @db.Text
+  messageType String   @default("text") // text, image, file, audio, video
+  fileUrl     String?
+  fileName    String?
+  fileSize    Int?
+  replyToId   String?
+  isEdited    Boolean  @default(false)
+  isDeleted   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  group   Group          @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  sender  User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  replyTo GroupMessage?  @relation("MessageReplies", fields: [replyToId], references: [id], onDelete: SetNull)
+  replies GroupMessage[] @relation("MessageReplies")
+
+  @@index([groupId, createdAt])
+  @@map("group_messages")
+}
+
+model UploadedFile {
+  id           String   @id @default(uuid())
+  userId       String
+  fileName     String
+  originalName String
+  mimeType     String
+  size         Int
+  path         String
+  url          String
+  category     String? // note, question, syllabus, profile, group, chat
+  createdAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("uploaded_files")
+}
+model DownloadHistory {
+  id          String   @id @default(uuid())
+  userId      String?
+  contentType String   // note, question, syllabus
+  contentId   String
+  downloadedAt DateTime @default(now())
+
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([contentType, contentId])
+  @@map("download_history")
 }
