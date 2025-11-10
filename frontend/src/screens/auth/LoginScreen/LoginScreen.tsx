@@ -1,28 +1,22 @@
-import React, { useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Alert,
-} from 'react-native';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useForm, Controller } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { AuthStackParamList } from '../../../types/navigation.types';
-import { LoginCredentials } from '../../../types/auth.types';
-import { SafeAreaWrapper } from '@components/layout/SafeArea/SafeAreaWrapper';
-import { Container } from '@components/layout/Container';
-import { TextInput } from '@components/common/Input/TextInput';
-import { PasswordInput } from '@components/common/Input/PasswordInput';
-import { PrimaryButton } from '@components/common/Button/PrimaryButton';
-import { Card } from '@components/common/Card/Card';
-import { useTheme } from '@hooks/useTheme';
-import { useAppDispatch, useAppSelector } from '@store/hooks';
-import { login, clearError } from '@store/slices/authSlice';
-import { loginSchema } from '@utils/validation/authSchema';
+import React, { useEffect } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { useForm, Controller } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { AuthStackParamList } from "../../../types/navigation.types";
+import { LoginCredentials } from "../../../types/auth.types";
+import { SafeAreaWrapper } from "@components/layout/SafeArea/SafeAreaWrapper";
+import { Container } from "@components/layout/Container";
+import { TextInput } from "@components/common/Input/TextInput";
+import { PasswordInput } from "@components/common/Input/PasswordInput";
+import { PrimaryButton } from "@components/common/Button/PrimaryButton";
+import { Card } from "@components/common/Card/Card";
+import { useTheme } from "@hooks/useTheme";
+import { useAppDispatch, useAppSelector } from "@store/hooks";
+import { login, clearError } from "@store/slices/authSlice";
+import { loginSchema } from "@utils/validation/authSchema";
 
-type Props = NativeStackScreenProps<AuthStackParamList, 'Login'>;
+type Props = NativeStackScreenProps<AuthStackParamList, "Login">;
 
 export const LoginScreen: React.FC<Props> = ({ navigation }) => {
   const theme = useTheme();
@@ -36,17 +30,17 @@ export const LoginScreen: React.FC<Props> = ({ navigation }) => {
   } = useForm<LoginCredentials>({
     resolver: yupResolver(loginSchema),
     defaultValues: {
-      email: '',
-      password: '',
+      email: "",
+      password: "",
     },
   });
 
   useEffect(() => {
     if (error) {
-      Alert.alert('Login Failed', error);
+      Alert.alert("Login Failed", error);
       dispatch(clearError());
     }
-  }, [error]);
+  }, [error, dispatch]);
 
   const onSubmit = async (data: LoginCredentials) => {
     try {
@@ -68,7 +62,7 @@ export const LoginScreen: React.FC<Props> = ({ navigation }) => {
                 styles.title,
                 {
                   color: theme.colors.text,
-                  fontSize: theme.typography.fontSize['3xl'],
+                  fontSize: theme.typography.fontSize["3xl"],
                   fontWeight: theme.typography.fontWeight.bold,
                 },
               ]}
@@ -124,7 +118,7 @@ export const LoginScreen: React.FC<Props> = ({ navigation }) => {
             />
 
             <TouchableOpacity
-              onPress={() => navigation.navigate('ForgotPassword')}
+              onPress={() => navigation.navigate("ForgotPassword")}
               style={styles.forgotPassword}
             >
               <Text
@@ -161,9 +155,9 @@ export const LoginScreen: React.FC<Props> = ({ navigation }) => {
                 },
               ]}
             >
-              Don't have an account?{' '}
+              Don't have an account?{" "}
             </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+            <TouchableOpacity onPress={() => navigation.navigate("Register")}>
               <Text
                 style={[
                   styles.signUpText,
@@ -192,20 +186,20 @@ const styles = StyleSheet.create({
     marginTop: 40,
   },
   title: {
-    textAlign: 'center',
+    textAlign: "center",
   },
   subtitle: {
-    textAlign: 'center',
+    textAlign: "center",
   },
   forgotPassword: {
-    alignSelf: 'flex-end',
+    alignSelf: "flex-end",
     marginBottom: 16,
   },
   forgotPasswordText: {},
   footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     marginTop: 32,
   },
   footerText: {},

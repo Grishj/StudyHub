@@ -1,3 +1,4 @@
+// @components/common/Card/Card.tsx
 import React from "react";
 import { View, StyleSheet, ViewStyle } from "react-native";
 import { useTheme } from "@hooks/useTheme";
@@ -22,7 +23,7 @@ export const Card: React.FC<CardProps> = ({
       style={[
         styles.card,
         {
-          backgroundColor: theme.colors.surface,
+          backgroundColor: theme.colors.backgroundSecondary, // ✅ consistent with other screens
           borderRadius: theme.borderRadius.lg,
           padding: padding || theme.spacing.md,
           ...theme.shadows[elevation],
